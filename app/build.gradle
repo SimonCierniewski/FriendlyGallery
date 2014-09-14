@@ -1,0 +1,122 @@
+buildscript {
+    repositories {
+        mavenCentral()
+//        maven { url 'http://download.crashlytics.com/maven' }
+        maven { url 'http://commondatastorage.googleapis.com/maven-repository' }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.12.2'
+//        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.10.1'
+    }
+}
+
+apply plugin: 'android-sdk-manager'
+apply plugin: 'com.android.application'
+//apply plugin: 'crashlytics'
+
+repositories {
+    mavenCentral()
+//    maven { url 'http://download.crashlytics.com/maven' }
+    maven { url 'https://commondatastorage.googleapis.com/maven-repository' }
+}
+
+dependencies {
+    compile 'com.jakewharton:butterknife:4.0.1'
+    compile 'com.squareup.dagger:dagger-compiler:1.2.1'
+    compile 'com.squareup.dagger:dagger:1.2.1'
+    compile 'com.google.guava:guava:17.0'
+    compile 'com.android.support:appcompat-v7:19.1.0'
+    compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.appunite:aucontentprovider:1.2.3-13527.1'
+    compile 'com.google.code.gson:gson:2.2.4'
+//    compile 'com.google.code.findbugs:jsr305:2.0.1'
+    compile 'javax.inject:javax.inject:1'
+//    compile 'com.crashlytics.android:crashlytics:[1.0.1,)'
+//    compile 'com.squareup:pollexor:2.0.2'
+    compile 'com.squareup.picasso:picasso:2.3.4'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:1.6.0'
+    compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
+    compile 'com.squareup.wire:wire-runtime:1.5.1'
+    compile 'dnsjava:dnsjava:2.1.6'
+    compile fileTree(dir: 'src/main/libs', include: '*.jar')
+
+//    androidTestCompile "org.objenesis:objenesis:1.0"
+//    androidTestCompile "com.google.code.findbugs:jsr305:2.0.1"
+//    androidTestCompile "javax.annotation:javax.annotation-api:1.2"
+//    androidTestCompile fileTree(dir: 'src/androidTest/libs', include: '*.jar')
+//    androidTestCompile "com.squareup:fest-android:1.0.4"
+//    androidTestCompile 'com.squareup.spoon:spoon-client:1.1.0'
+}
+
+project.ext.versionCode = 1
+def baseVersionName = "0.1.0"
+
+if (project.hasProperty("versionSuffix")) {
+    project.ext.versionSuffix = project.versionSuffix
+} else {
+    project.ext.versionSuffix = "snapshot"
+}
+if (project.ext.versionSuffix) {
+    project.ext.versionName = "${baseVersionName}-${project.versionSuffix}"
+} else {
+    project.ext.versionName = "${baseVersionName}"
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion '19.1.0'
+
+    defaultConfig {
+        minSdkVersion 10
+        targetSdkVersion 19
+        versionCode project.ext.versionCode
+        versionName project.ext.versionName
+        applicationId "pl.cierniewski.friendlygallery"
+//        testApplicationId "pl.cierniewski.facesgallery.test"
+//        testInstrumentationRunner "pl.cierniewski.facesgallery.test.runner.InjectableInstrumentationTestRunner"
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("cierniewski-debug.keystore")
+        }
+        release {
+            storeFile file("cierniewski-debug.keystore")
+        }
+    }
+
+    buildTypes {
+        release {
+            runProguard false
+            debuggable false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            applicationIdSuffix ""
+            versionNameSuffix ""
+//            ext.enableCrashlytics = true
+            signingConfig signingConfigs.release
+        }
+        debug {
+            debuggable true
+            runProguard false
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+//            ext.enableCrashlytics = false;
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'LICENSE.txt'
+    }
+
+    lintOptions {
+        abortOnError true
+        disable 'InvalidPackage'
+        xmlOutput file("${reportsDir}/lint/lint-results.xml")
+        htmlOutput file("${reportsDir}/lint/lint-results.html")
+    }
+}
