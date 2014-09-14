@@ -40,6 +40,7 @@ dependencies {
     compile 'com.squareup.wire:wire-runtime:1.5.1'
     compile 'dnsjava:dnsjava:2.1.6'
     compile fileTree(dir: 'src/main/libs', include: '*.jar')
+    compile project(':facebook')
 
 //    androidTestCompile "org.objenesis:objenesis:1.0"
 //    androidTestCompile "com.google.code.findbugs:jsr305:2.0.1"

@@ -1,6 +1,7 @@
 #Keystore
 keystore.properties
 *.keystore
+keys.xml
 
 #Android generated
 bin
