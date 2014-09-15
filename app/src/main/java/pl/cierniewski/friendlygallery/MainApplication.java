@@ -2,6 +2,8 @@ package pl.cierniewski.friendlygallery;
 
 import android.app.Application;
 
+import com.facebook.LoggingBehavior;
+import com.facebook.Settings;
 import com.squareup.okhttp.internal.http.HttpTransport;
 
 import java.util.logging.Level;
@@ -29,6 +31,15 @@ public class MainApplication extends Application {
 //            Crashlytics.start(this);
 //            mLogHelper.registerCrashlyticsKeys();
         }
+
+        // Facebook logging
+        Settings.addLoggingBehavior(LoggingBehavior.REQUESTS);
+        Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
+        Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_RAW_RESPONSES);
+        Settings.addLoggingBehavior(LoggingBehavior.CACHE);
+        Settings.addLoggingBehavior(LoggingBehavior.APP_EVENTS);
+        Settings.addLoggingBehavior(LoggingBehavior.DEVELOPER_ERRORS);
+        Settings.setIsLoggingEnabled(true);
     }
 
     public void setApplicationModule(Object applicationModule) {
