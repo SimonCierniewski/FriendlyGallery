@@ -1,2 +1,2 @@
-include ':app', ':facebook'
+include ':app', ':facebook', ':FacebookApi'
 project(':facebook').projectDir = new File('libraries/facebook')

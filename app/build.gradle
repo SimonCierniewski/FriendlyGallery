@@ -27,6 +27,7 @@ dependencies {
 //    compile 'com.squareup:pollexor:2.0.2'
     compile fileTree(dir: 'src/main/libs', include: '*.jar')
     compile project(':facebook')
+    compile project(':FacebookApi')
 
 //    androidTestCompile "org.objenesis:objenesis:1.0"
 //    androidTestCompile "com.google.code.findbugs:jsr305:2.0.1"
