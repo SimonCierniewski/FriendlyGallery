@@ -18,12 +18,12 @@ import dagger.ObjectGraph;
 import dagger.Provides;
 import pl.cierniewski.friendlygallery.facebookapi.base.UserData;
 
-public abstract class BaseGistrApiTest {
+public abstract class BaseApiTest {
 
     @Module(
             injects = {
                     FacebookApi.class,
-                    GistrUsersApiTest.class},
+                    FacebookApiTest.class},
             includes = MockModule.class,
             overrides = true
     )

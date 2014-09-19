@@ -7,6 +7,7 @@ import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.UriTemplate;
+import com.google.api.client.util.Key;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -28,7 +29,8 @@ import javax.inject.Provider;
 import javax.net.ssl.SSLException;
 
 import pl.cierniewski.friendlygallery.facebookapi.content.GsonHttpContent;
-import pl.cierniewski.friendlygallery.facebookapi.model.UsersRegisterResponse;
+import pl.cierniewski.friendlygallery.facebookapi.model.GetFriendsResponse;
+import pl.cierniewski.friendlygallery.facebookapi.model.GetPhotosResponse;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -58,10 +60,6 @@ public class FacebookApi {
     public FacebookApi() {
     }
 
-    public UsersApi users() {
-        return new UsersApi();
-    }
-
     public static class ValidationException extends IOException {
 
         public ValidationException(String detailMessage) {
@@ -73,6 +71,7 @@ public class FacebookApi {
 
         private final String mUriTemplate;
         private final String mRequestMethod;
+        protected int mLimit = 0;
         private HttpContent mContent;
 
         public Request(String requestMethod, String uriTemplate) {
@@ -90,6 +89,15 @@ public class FacebookApi {
         protected HttpResponse executeRequest() throws IOException {
             final GenericUrl genericUrl = new GenericUrl(
                     UriTemplate.expand(mServer.getBaseUrl(), mUriTemplate, this, true));
+
+            genericUrl.put("access_token", mAuthTokenFactory.getAuthToken());
+            genericUrl.put("format", "json");
+            genericUrl.put("pretty", "0");
+            genericUrl.put("suppress_http_code", "1");
+            if (mLimit > 0) {
+                genericUrl.put("limit", mLimit);
+            }
+
             final HttpRequest httpRequest = getRequestFactory().buildRequest(mRequestMethod, genericUrl,
                     mContent);
             setupRequest(httpRequest);
@@ -150,10 +158,11 @@ public class FacebookApi {
         private final Class<T> mResponseClass;
 
         public BaseRequest(String requestMethod, String uriTemplate,
-                           Object content, Class<T> responseClass) {
+                           Object content, Class<T> responseClass, int limit) {
             super(requestMethod, uriTemplate);
             mResponseClass = checkNotNull(responseClass);
             setObjectContent(content);
+            mLimit = limit;
         }
 
         public void setObjectContent(Object content) {
@@ -239,19 +248,33 @@ public class FacebookApi {
         }
     }
 
-    public class UsersApi {
+    public GetFriends getFriends(int limit) {
+        return new GetFriends(limit);
+    }
 
-        public Register register() {
-            return new Register();
+    public GetPhotos getPhotos(String friendId, int limit) {
+        return new GetPhotos(friendId, limit);
+    }
+
+    public class GetFriends extends BaseRequest<GetFriendsResponse> {
+
+        private static final String REST_PATH = "v1.0/me/friends";
+
+        private GetFriends(int limit) {
+            super(HttpMethods.GET, REST_PATH, null, GetFriendsResponse.class, limit);
         }
+    }
 
-        public class Register extends BaseRequest<UsersRegisterResponse> {
+    public class GetPhotos extends BaseRequest<GetPhotosResponse> {
 
-            private static final String REST_PATH = "v1.0/me/friends.json";
+        private static final String REST_PATH = "v1.0/{friendId}/photos";
 
-            private Register() {
-                super(HttpMethods.GET, REST_PATH, null, UsersRegisterResponse.class);
-            }
+        @Key
+        String friendId;
+
+        private GetPhotos(String friendId, int limit) {
+            super(HttpMethods.GET, REST_PATH, null, GetPhotosResponse.class, limit);
+            this.friendId = friendId;
         }
     }
 }

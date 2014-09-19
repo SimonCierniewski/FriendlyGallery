@@ -1,5 +1,5 @@
 package pl.cierniewski.friendlygallery.facebookapi.base;
 
 public class UserData {
-    public static final String AUTH_TOKEN = "VqsNVT6FGF8zJRnxa4fL";
+    public static final String AUTH_TOKEN = "CAACEdEose0cBADgU4OriZBzScl9HOxc7IsbZCAPv8chIbAGbmCPkJmLh5TwOS7pjipA2t4zEszsG6cWDbjmRUWSQQ7TeQfkdz7AnJmMYfmHYokVZC4HaHjRO2dZAaFZAIFv3PJ4TqRXSzk0GydwZBFUerumw3IFilMpYl1wxtKTMEso5hpk1kdqiZBXETdOL5XZBiZAz0lEsrSmqPfWSqOHse";
 }

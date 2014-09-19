@@ -2,9 +2,10 @@ package pl.cierniewski.friendlygallery.facebookapi.model;
 
 import net.sf.oval.constraint.NotNull;
 
-public class UsersRegisterResponse {
+public class FriendType {
 
     @NotNull
-    public String accessToken;
-
+    public String id;
+    @NotNull
+    public String name;
 }
