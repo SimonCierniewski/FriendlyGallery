@@ -71,7 +71,6 @@ public class FacebookApi {
 
         private final String mUriTemplate;
         private final String mRequestMethod;
-        protected int mLimit = 0;
         private HttpContent mContent;
 
         public Request(String requestMethod, String uriTemplate) {
@@ -89,15 +88,6 @@ public class FacebookApi {
         protected HttpResponse executeRequest() throws IOException {
             final GenericUrl genericUrl = new GenericUrl(
                     UriTemplate.expand(mServer.getBaseUrl(), mUriTemplate, this, true));
-
-            genericUrl.put("access_token", mAuthTokenFactory.getAuthToken());
-            genericUrl.put("format", "json");
-            genericUrl.put("pretty", "0");
-            genericUrl.put("suppress_http_code", "1");
-            if (mLimit > 0) {
-                genericUrl.put("limit", mLimit);
-            }
-
             final HttpRequest httpRequest = getRequestFactory().buildRequest(mRequestMethod, genericUrl,
                     mContent);
             setupRequest(httpRequest);
@@ -158,11 +148,10 @@ public class FacebookApi {
         private final Class<T> mResponseClass;
 
         public BaseRequest(String requestMethod, String uriTemplate,
-                           Object content, Class<T> responseClass, int limit) {
+                           Object content, Class<T> responseClass) {
             super(requestMethod, uriTemplate);
             mResponseClass = checkNotNull(responseClass);
             setObjectContent(content);
-            mLimit = limit;
         }
 
         public void setObjectContent(Object content) {
@@ -248,6 +237,31 @@ public class FacebookApi {
         }
     }
 
+    public class FacebookRequest<T> extends BaseRequest<T> {
+        @Key
+        String access_token;
+        @Key
+        String limit;
+        @Key
+        String format;
+        @Key
+        String pretty;
+        @Key
+        String suppress_http_code;
+
+        public FacebookRequest(String requestMethod, String uriTemplate, Object content, Class<T> responseClass, int limit) {
+            super(requestMethod, uriTemplate, content, responseClass);
+
+            this.access_token = mAuthTokenFactory.getAuthToken();
+            this.limit = String.valueOf(limit);
+
+            this.format = "json";
+            this.pretty = "0";
+            this.suppress_http_code = "1";
+        }
+    }
+
+
     public GetFriends getFriends(int limit) {
         return new GetFriends(limit);
     }
@@ -256,7 +270,7 @@ public class FacebookApi {
         return new GetPhotos(friendId, limit);
     }
 
-    public class GetFriends extends BaseRequest<GetFriendsResponse> {
+    public class GetFriends extends FacebookRequest<GetFriendsResponse> {
 
         private static final String REST_PATH = "v1.0/me/friends";
 
@@ -265,7 +279,7 @@ public class FacebookApi {
         }
     }
 
-    public class GetPhotos extends BaseRequest<GetPhotosResponse> {
+    public class GetPhotos extends FacebookRequest<GetPhotosResponse> {
 
         private static final String REST_PATH = "v1.0/{friendId}/photos";
 
