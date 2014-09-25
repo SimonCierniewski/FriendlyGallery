@@ -19,7 +19,7 @@ public class PhotoType {
     @MinSize(1)
     public List<ImageType> images;
 
-    @AssertValid
+//    @AssertValid
     public TagsType tags;
 
     public String createdTime;

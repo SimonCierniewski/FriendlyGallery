@@ -7,7 +7,7 @@ public class ImageType {
     @NotNull
     public String source;
     @NotNull
-    public String width;
+    public int width;
     @NotNull
-    public String height;
+    public int height;
 }

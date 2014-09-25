@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import dagger.ObjectGraph;
 import pl.cierniewski.friendlygallery.dagger.ApplicationModule;
+import pl.cierniewski.friendlygallery.helper.LogHelper;
 
 public class MainApplication extends Application {
 
@@ -27,6 +28,7 @@ public class MainApplication extends Application {
 
         if (BuildConfig.DEBUG) {
             Logger.getLogger(HttpTransport.class.getName()).setLevel(Level.CONFIG);
+            LogHelper.getFacebookDataCollectorLogger().setLevel(Level.FINEST);
         } else {
 //            Crashlytics.start(this);
 //            mLogHelper.registerCrashlyticsKeys();

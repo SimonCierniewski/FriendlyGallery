@@ -2,9 +2,15 @@ package pl.cierniewski.friendlygallery.helper;
 
 import android.util.Log;
 
+import java.util.logging.Logger;
+
 import pl.cierniewski.friendlygallery.BuildConfig;
 
 public class LogHelper {
+
+    public static Logger getFacebookDataCollectorLogger() {
+        return Logger.getLogger("FacebookDataCollector");
+    }
 
     public static void e(String tag, String message, Throwable e) {
         if (BuildConfig.DEBUG) {

@@ -263,12 +263,12 @@ public class FacebookApi {
     }
 
 
-    public GetFriends getFriends(int limit) {
-        return new GetFriends(limit);
+    public GetFriends getFriends(String friendId, int limit) {
+        return new GetFriends(friendId, limit);
     }
 
-    public GetPhotos getPhotos(String friendId, int limit) {
-        return new GetPhotos(friendId, limit);
+    public GetPhotos getPhotos(String friendOrAlbumId, int limit) {
+        return new GetPhotos(friendOrAlbumId, limit);
     }
 
     public GetAlbums getAlbums(String friendId, int limit) {
@@ -277,10 +277,14 @@ public class FacebookApi {
 
     public class GetFriends extends FacebookRequest<GetFriendsResponse> {
 
-        private static final String REST_PATH = "v1.0/me/friends";
+        private static final String REST_PATH = "v1.0/{friendId}/friends";
 
-        private GetFriends(int limit) {
+        @Key
+        String friendId;
+
+        private GetFriends(String friendId, int limit) {
             super(HttpMethods.GET, REST_PATH, null, GetFriendsResponse.class, limit);
+            this.friendId = friendId;
         }
     }
 

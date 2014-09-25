@@ -20,7 +20,7 @@ public class FacebookApiTest extends BaseApiTest {
 
     @Test
     public void testGetFriends() throws Exception {
-        final GetFriendsResponse getFriendsResponse = mFacebookApi.getFriends(1000).execute();
+        final GetFriendsResponse getFriendsResponse = mFacebookApi.getFriends("me", 1000).execute();
         assertThat(getFriendsResponse, is(notNullValue()));
     }
 
