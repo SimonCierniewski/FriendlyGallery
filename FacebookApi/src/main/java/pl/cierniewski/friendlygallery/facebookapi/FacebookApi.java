@@ -29,6 +29,7 @@ import javax.inject.Provider;
 import javax.net.ssl.SSLException;
 
 import pl.cierniewski.friendlygallery.facebookapi.content.GsonHttpContent;
+import pl.cierniewski.friendlygallery.facebookapi.model.GetAlbumsResponse;
 import pl.cierniewski.friendlygallery.facebookapi.model.GetFriendsResponse;
 import pl.cierniewski.friendlygallery.facebookapi.model.GetPhotosResponse;
 
@@ -270,6 +271,10 @@ public class FacebookApi {
         return new GetPhotos(friendId, limit);
     }
 
+    public GetAlbums getAlbums(String friendId, int limit) {
+        return new GetAlbums(friendId, limit);
+    }
+
     public class GetFriends extends FacebookRequest<GetFriendsResponse> {
 
         private static final String REST_PATH = "v1.0/me/friends";
@@ -288,6 +293,19 @@ public class FacebookApi {
 
         private GetPhotos(String friendId, int limit) {
             super(HttpMethods.GET, REST_PATH, null, GetPhotosResponse.class, limit);
+            this.friendId = friendId;
+        }
+    }
+
+    public class GetAlbums extends FacebookRequest<GetAlbumsResponse> {
+
+        private static final String REST_PATH = "v1.0/{friendId}/albums";
+
+        @Key
+        String friendId;
+
+        private GetAlbums(String friendId, int limit) {
+            super(HttpMethods.GET, REST_PATH, null, GetAlbumsResponse.class, limit);
             this.friendId = friendId;
         }
     }

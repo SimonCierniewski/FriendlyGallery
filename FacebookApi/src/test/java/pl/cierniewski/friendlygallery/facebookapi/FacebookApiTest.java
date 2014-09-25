@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import javax.inject.Inject;
 
+import pl.cierniewski.friendlygallery.facebookapi.model.GetAlbumsResponse;
 import pl.cierniewski.friendlygallery.facebookapi.model.GetFriendsResponse;
 import pl.cierniewski.friendlygallery.facebookapi.model.GetPhotosResponse;
 
@@ -27,6 +28,12 @@ public class FacebookApiTest extends BaseApiTest {
     public void testPhotos() throws Exception {
         final GetPhotosResponse getPhotosResponse = mFacebookApi.getPhotos("10202936452027406", 100).execute();
         assertThat(getPhotosResponse, is(notNullValue()));
+    }
+
+    @Test
+    public void testAlbums() throws Exception {
+        final GetAlbumsResponse getAlbumsResponse = mFacebookApi.getAlbums("10202929462052661", 100).execute();
+        assertThat(getAlbumsResponse, is(notNullValue()));
     }
 }
 
