@@ -35,7 +35,8 @@ public class FacebookDataCollector {
     }
 
     public List<Album> collectAlbumsWithPhotos(String friendId, int limit) throws IOException {
-        final List<Album> albums = collectAlbums(friendId, limit);
+        final List<Album> albums = Lists.newArrayList();
+        albums.addAll(collectAlbums(friendId, limit));
 
         final Set<String> photosInAlbumsIds = Sets.newHashSet();
 

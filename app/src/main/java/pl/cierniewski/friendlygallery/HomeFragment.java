@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.facebook.UiLifecycleHelper;
 import com.facebook.widget.LoginButton;
+import com.google.api.client.util.Lists;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
@@ -156,9 +157,10 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void run() {
                 try {
+                    final List<Friend> friendsResponse = mFacebookDataCollector.collectFriends("me", 1000);
 
-                    final List<Friend> friends = mFacebookDataCollector.collectFriends("me", 1000);
-
+                    final List<Friend> friends = Lists.newArrayList();
+                    friends.addAll(friendsResponse);
                     final Friend me = new Friend("633148500136430", "Szymon Cierniewski");
                     friends.add(me);
 
@@ -169,8 +171,8 @@ public class HomeFragment extends BaseFragment {
 
                         final String friendData = mGson.toJson(friend);
 
-                        final String fileName = String.format("%s_%s.txt", friend.id, friend.name.replace(' ', '_'));
-                        Files.write(friendData, mMainDirectory, Charsets.UTF_8);
+                        final File friendFile = new File(mMainDirectory, String.format("/structure/%s_%s.txt", friend.id, friend.name.replace(' ', '_')));
+                        Files.write(friendData, friendFile, Charsets.UTF_8);
 
                         i++;
                         Log.d(TAG, i + " FACEBOOK DATA COLLECTED: " + friend.name);
