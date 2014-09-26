@@ -7,6 +7,8 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import pl.cierniewski.friendlygallery.MainApplication;
+import pl.cierniewski.friendlygallery.facebookapi.ProductionServer;
+import pl.cierniewski.friendlygallery.facebookapi.Server;
 
 @Module (
         includes = {BaseModule.class},
@@ -26,5 +28,11 @@ public class ApplicationModule {
     @ForApplication
     Context provideApplicationContext() {
         return mMainApplication;
+    }
+
+    @Singleton
+    @Provides
+    Server provideServer() {
+        return new ProductionServer();
     }
 }

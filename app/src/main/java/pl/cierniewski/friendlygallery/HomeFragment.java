@@ -1,24 +1,23 @@
 package pl.cierniewski.friendlygallery;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
 
-import com.facebook.HttpMethod;
-import com.facebook.Request;
-import com.facebook.Response;
-import com.facebook.Session;
-import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.widget.LoginButton;
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,6 +26,8 @@ import javax.inject.Inject;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import pl.cierniewski.friendlygallery.dagger.ForActivity;
+import pl.cierniewski.friendlygallery.facebook.FacebookDataCollector;
+import pl.cierniewski.friendlygallery.facebook.Friend;
 
 public class HomeFragment extends BaseFragment {
 
@@ -39,9 +40,13 @@ public class HomeFragment extends BaseFragment {
     Context mContext;
     @Inject
     ConnectivityManager mConnectivityManager;
+    @Inject
+    FacebookDataCollector mFacebookDataCollector;
+    @Inject
+    Gson mGson;
+    @Inject
+    ListeningExecutorService mExecutor;
 
-    @InjectView(R.id.home_update_photos_button)
-    Button mUpdatePhotosButton;
     @InjectView(R.id.facebook_login_button)
     LoginButton mLoginButton;
 
@@ -58,8 +63,8 @@ public class HomeFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUiLifecycleHelper = new UiLifecycleHelper(getActivity(), statusCallback);
-        mUiLifecycleHelper.onCreate(savedInstanceState);
+//        mUiLifecycleHelper = new UiLifecycleHelper(getActivity(), statusCallback);
+//        mUiLifecycleHelper.onCreate(savedInstanceState);
     }
 
     @Override
@@ -68,6 +73,7 @@ public class HomeFragment extends BaseFragment {
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
+    /* TODO Uncomment Facebook Login
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -120,13 +126,50 @@ public class HomeFragment extends BaseFragment {
                 HttpMethod.GET,
                 new Request.Callback() {
                     public void onCompleted(Response response) {
-                            /* handle the result */
                         Log.e(TAG, response.getRawResponse());
                     }
                 }
         ).executeAsync();
+    }*/
+
+    @OnClick(R.id.home_get_facebook_structure_button)
+    public void onGetFacebookStructureClicked() {
+
+        mExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+
+                    final List<Friend> friends = mFacebookDataCollector.collectFriends("me", 1000);
+
+                    final Friend me = new Friend("633148500136430", "Szymon Cierniewski");
+                    friends.add(me);
+
+                    int i = 0;
+                    for (Friend friend : friends) {
+//                    final Friend friend = friends.get(37);
+                        friend.albums = mFacebookDataCollector.collectAlbumsWithPhotos(friend.id, 5000);
+
+                        final String friendData = mGson.toJson(friend);
+
+                        final String fileName = String.format("%s_%s.txt", friend.id, friend.name.replace(' ', '_'));
+                        final File file = new File(mContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName);
+                        Files.write(friendData, file, Charsets.UTF_8);
+
+                        i++;
+                        Log.d(TAG, i + " FACEBOOK DATA COLLECTED: " + friend.name);
+                    }
+
+                    Log.e(TAG, "FACEBOOK DATA COLLECTED");
+
+                } catch (IOException e) {
+                    Log.d(TAG, "Error while collecting data: " + e.toString());
+                }
+            }
+        });
     }
 
+    /* TODO Uncomment Facebook Login
     @Override
     public void onResume() {
         super.onResume();
@@ -165,5 +208,5 @@ public class HomeFragment extends BaseFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mUiLifecycleHelper.onSaveInstanceState(outState);
-    }
+    }*/
 }

@@ -5,12 +5,16 @@ import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.util.Log;
 
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.okhttp.OkHttpTransport;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.squareup.okhttp.HttpResponseCache;
@@ -35,14 +39,73 @@ import javax.net.ssl.SSLSocketFactory;
 import dagger.Module;
 import dagger.Provides;
 import pl.cierniewski.friendlygallery.BuildConfig;
+import pl.cierniewski.friendlygallery.facebookapi.ApiModule;
+import pl.cierniewski.friendlygallery.facebookapi.AuthTokenFactory;
+import pl.cierniewski.friendlygallery.facebookapi.UserAgentFactory;
+import pl.cierniewski.friendlygallery.facebookapi.base.UserData;
 import pl.cierniewski.friendlygallery.helper.LogHelper;
 
 @Module(
+        includes = {ApiModule.class},
         library = true,
         complete = false
 )
 public class BaseModule {
     private static final String TAG = "BaseModule";
+
+    @Singleton
+    @Provides
+    AuthTokenFactory provideAuthTokenFactory() {
+        return new AuthTokenFactory() {
+            @Override
+            public String getAuthToken() {
+                return UserData.AUTH_TOKEN;
+            }
+        };
+    }
+
+    @Singleton
+    @Provides
+    UserAgentFactory providesUserAgentFactory(@ForApplication Context context) {
+        final String userAgent;
+        try {
+            String packageName = context.getPackageName();
+            final PackageManager packageManager = context.getPackageManager();
+            assert  packageManager != null;
+            PackageInfo info = packageManager.getPackageInfo(
+                    packageName, 0);
+            if (info == null) {
+                throw new RuntimeException("Could not find package name");
+            }
+            userAgent = packageName + "/" + info.versionName + " (" + info.versionCode + ")/" +
+                    Build.MANUFACTURER + ";" + Build.PRODUCT + " " + Build.MODEL;
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException("Could not find package name", e);
+        }
+
+        return new UserAgentFactory() {
+            @Override
+            public String getUserAgent() {
+                return userAgent;
+            }
+
+        };
+    }
+
+    @Singleton
+    @Provides
+    @Named("OkHttp")
+    public SSLSocketFactory provideSSLSocketFactory() {
+        try {
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, null, null);
+            return sslContext.getSocketFactory();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SSLSocket Factory Provider cannot be initialized.", e);
+        } catch (KeyManagementException e) {
+            throw new RuntimeException("SSLSocket Factory Provider cannot be initialized.", e);
+        }
+    }
 
     @Singleton
     @Provides
@@ -57,6 +120,27 @@ public class BaseModule {
         } catch (KeyManagementException e) {
             throw new RuntimeException("SSLSocket Factory Provider cannot be initialized.", e);
         }
+    }
+
+    @Singleton
+    @Provides
+    public OkHttpClient provideOkHttpClient(@ForApplication Context context,
+                                            @Named("OkHttp") SSLSocketFactory sslSocketFactory) {
+
+        HttpResponseCache responseCache = null;
+        try {
+            File httpCacheDir = new File(context.getCacheDir(), "cache");
+            long httpCacheSize = 150 * 1024 * 1024; // 150 MiB
+            responseCache = new HttpResponseCache(httpCacheDir, httpCacheSize);
+        } catch (IOException e) {
+            Log.i(TAG, "HTTP response cache installation failed:", e);
+        }
+        final OkHttpClient okHttpClient = new OkHttpClient();
+        if (responseCache != null) {
+            okHttpClient.setResponseCache(responseCache);
+        }
+        okHttpClient.setSslSocketFactory(sslSocketFactory);
+        return okHttpClient;
     }
 
     @Singleton
@@ -79,6 +163,14 @@ public class BaseModule {
         }
         okHttpClient.setSslSocketFactory(sslSocketFactory);
         return okHttpClient;
+    }
+
+    @Singleton
+    @Provides
+    HttpTransport provideHttpTransport(OkHttpClient okHttpClient) {
+        return new OkHttpTransport.Builder()
+                .setOkHttpClient(okHttpClient)
+                .build();
     }
 
     @Provides

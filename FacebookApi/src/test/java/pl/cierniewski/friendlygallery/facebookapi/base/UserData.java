@@ -1,5 +1,0 @@
-package pl.cierniewski.friendlygallery.facebookapi.base;
-
-public class UserData {
-    public static final String AUTH_TOKEN = "CAACEdEose0cBACFv7ePAqN9gaEIivEsl6myZAMmdZA3uE1ZCmPPZAxkzKtXtoZCcY9CTi8YG4ed3uWGMuLMKdj8bzQRoh30UmOzy28BU9ZCYFV7z7c7DcuuiWw7LDXBkGznnbGB48iWMZCfl6MmXzaRZC0WMf56e9cIWxCZCoU9lUX0q8V6FznYaFKf1viJymnS0ebNPJ2J1nWZBBBCGkqzAgA";
-}
