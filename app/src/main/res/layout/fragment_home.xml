@@ -18,6 +18,22 @@
         android:layout_height="wrap_content"
         android:text="@string/home_get_facebook_structure"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="40dp"/>
+
+    <Button
+        android:id="@+id/home_download_photos_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/home_download_photos"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:id="@+id/home_available_space_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/home_available_space"
+        android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"/>
 
 </LinearLayout>

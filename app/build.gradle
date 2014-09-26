@@ -70,7 +70,7 @@ android {
     buildToolsVersion '19.1.0'
 
     defaultConfig {
-        minSdkVersion 10
+        minSdkVersion 18
         targetSdkVersion 19
         versionCode project.ext.versionCode
         versionName project.ext.versionName

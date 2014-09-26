@@ -27,4 +27,12 @@ public class Friend extends FriendType {
             return new Friend(input);
         }
     };
+
+    public int getPhotosCount() {
+        int count = 0;
+        for (Album album : albums) {
+            count += album.photos != null ? album.photos.size() : 0;
+        }
+        return count;
+    }
 }

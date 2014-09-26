@@ -3,5 +3,7 @@
 
     <string name="app_name">Friendly Gallery</string>
     <string name="home_get_facebook_structure">Get Facebook structure</string>
+    <string name="home_download_photos">Download photos</string>
+    <string name="home_available_space">Check available space</string>
 
 </resources>
